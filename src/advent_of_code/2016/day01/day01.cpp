@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -35,9 +36,28 @@ namespace advent_of_code::year2016::day01
     return std::abs(current_position.first) + std::abs(current_position.second);
   }
 
-  auto Solution::solve_part2(const std::vector<std::pair<DIRECTION, int>>& /*input*/) -> int
+  auto Solution::solve_part2(const std::vector<std::pair<DIRECTION, int>>& input) -> int
   {
-    return 0;
+    // HQ: visited twice
+    std::unordered_set<std::string> visited_positions;
+    std::pair<int, int> current_position = { 0, 0 };
+    DIRECTION current_direction = DIRECTION::NORTH;
+    for (const auto& [turn, steps] : input)
+    {
+      current_direction = static_cast<DIRECTION>((static_cast<int>(current_direction) + static_cast<int>(turn)) % 4);
+
+      // walk the steps
+      for (int i = 0; i < steps; ++i)
+      {
+        update_position(current_position, current_direction, 1);
+        std::string position_key = std::to_string(current_position.first) + "," + std::to_string(current_position.second);
+        if (visited_positions.count(position_key) != 0U)
+        {
+          return std::abs(current_position.first) + std::abs(current_position.second);
+        }
+        visited_positions.insert(position_key);
+      }
+    }
   }
 
   auto Solution::parse_input(const std::vector<std::filesystem::path>& possible_paths)
@@ -45,7 +65,6 @@ namespace advent_of_code::year2016::day01
   {
     std::vector<std::pair<DIRECTION, int>> result;
     std::ifstream inputFile;
-
     // check for possible path
     for (const auto& path : possible_paths)
     {
@@ -55,7 +74,9 @@ namespace advent_of_code::year2016::day01
         std::string line;
         while (std::getline(inputFile, line))
         {
-          // split by `, `
+          // remove leading and trailing whitespace
+          line.erase(remove_if(line.begin(), line.end(), isspace), line.end());
+
           std::stringstream stream(line);
           std::string token;
           while (std::getline(stream, token, ','))

@@ -8,8 +8,9 @@ auto main() noexcept -> int
 {
   // Try multiple possible locations for the input file
   const std::vector<std::filesystem::path> possible_paths = {
-    "input.txt",                               // For make run (executable in build/bin/Debug)
-    "src/advent_of_code/2015/day02/input.txt"  // For direct execution from project root
+    "input.txt",                                        // For make run (executable in build/bin/Debug)
+    "src/advent_of_code/2015/day02/input.txt",          // For direct execution from project root
+    "../../../src/advent_of_code/2015/day02/input.txt"  // For clion execution (executable in build/bin/Debug)
   };
 
   const std::vector<std::vector<int>> input = advent_of_code::year2015::day02::Solution::parse_input(possible_paths);
